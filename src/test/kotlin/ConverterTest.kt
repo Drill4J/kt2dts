@@ -5,7 +5,7 @@ import kotlin.test.*
 
 class ConverterTest {
     @Test
-    fun `convert Sample class correctly`() {
+    fun `converts Sample class correctly`() {
         val descriptors = sequenceOf(
             Sample::class to Sample.serializer().descriptor
         )
@@ -19,5 +19,10 @@ class ConverterTest {
             assertEquals("str", name)
             assertEquals("string | null", type)
         }
+    }
+
+    @Test
+    fun `converts Complex class correctly`() {
+
     }
 }
