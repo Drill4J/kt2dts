@@ -16,6 +16,8 @@ fun Sequence<TsInterface>.appendTo(appendable: Appendable, module: String) {
     appendable.appendln("}")
 }
 
+fun TsInterface.render(): String = "${StringBuffer().also { appendTo(it) }}"
+
 fun TsInterface.appendTo(
     appendable: Appendable,
     modifier: String = "",

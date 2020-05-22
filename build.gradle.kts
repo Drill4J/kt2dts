@@ -7,7 +7,7 @@ plugins {
 val scriptUrl: String by extra
 
 allprojects {
-    apply(from = "$scriptUrl/git-version.gradle.kts")
+    apply(from = rootProject.uri("$scriptUrl/git-version.gradle.kts"))
 
     pluginManager.withPlugin("org.gradle.java-base") {
         java.targetCompatibility = JavaVersion.VERSION_1_8
@@ -15,7 +15,7 @@ allprojects {
 
     repositories {
         mavenLocal()
-        apply(from = "$scriptUrl/maven-repo.gradle.kts")
+        apply(from = rootProject.uri("$scriptUrl/maven-repo.gradle.kts"))
         jcenter()
     }
 
@@ -28,6 +28,14 @@ allprojects {
         dependencyConstraints += depConstraints
     }
 
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs = listOf(
+                "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -38,12 +46,6 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
     testImplementation(project(":api-sample"))
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.freeCompilerArgs += listOf(
-        "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
-    )
 }
 
 publishing.publications {
