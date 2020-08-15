@@ -20,9 +20,9 @@ data class TsField(
 )
 
 fun Sequence<TsType>.appendTo(appendable: Appendable, module: String) {
-    appendable.appendln("declare module '$module' {")
+    appendable.appendLine("declare module '$module' {")
     forEach { it.appendTo(appendable, indent = "  ", modifier = "export ") }
-    appendable.appendln("}")
+    appendable.appendLine("}")
 }
 
 fun TsType.render(): String = "${StringBuffer().also { appendTo(it) }}"
@@ -34,14 +34,14 @@ fun TsType.appendTo(
 ) {
     when(this) {
         is TsInterface -> {
-            appendable.appendln("$indent${modifier}interface $name {")
+            appendable.appendLine("$indent${modifier}interface $name {")
             fields.forEach {
-                appendable.appendln("$indent  ${it.name}: ${it.type};")
+                appendable.appendLine("$indent  ${it.name}: ${it.type};")
             }
-            appendable.appendln("$indent}")
+            appendable.appendLine("$indent}")
         }
         is TsUnion -> {
-            appendable.appendln("$indent${modifier}type $name = ${types.joinToString(" | ")}")
+            appendable.appendLine("$indent${modifier}type $name = ${types.joinToString(" | ")}")
         }
     }
 }

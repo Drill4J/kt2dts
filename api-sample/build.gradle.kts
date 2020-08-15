@@ -4,6 +4,5 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core")
 }

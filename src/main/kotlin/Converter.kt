@@ -1,6 +1,9 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.epam.drill.ts.kt2dts
 
 import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.*
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 
@@ -16,7 +19,7 @@ fun Sequence<Descriptor>.convert(): Sequence<TsType> = mapNotNull { descriptor -
                 listOf(TsField("type", "'${it.value}'"))
             } ?: emptyList()
             val classProps = klass.memberProperties.associate { it.name to it.returnType }
-            val fields = serDe.elementDescriptors().mapIndexed { i, ed ->
+            val fields = serDe.elementDescriptors.mapIndexed { i, ed ->
                 val name = serDe.getElementName(i)
                 val kType: KType = classProps.getValue(name)
                 val opt = "?".takeIf { serDe.isElementOptional(i) } ?: ""
@@ -35,7 +38,7 @@ private fun SerialDescriptor.toTsType(kType: KType): String = when (kind) {
     PrimitiveKind.STRING -> "string"
     PrimitiveKind.BOOLEAN -> "boolean"
     is PrimitiveKind -> numberType()
-    UnionKind.ENUM_KIND -> elementNames().joinToString(" | ") { "'$it'" }
+    SerialKind.ENUM -> elementNames.joinToString(" | ") { "'$it'" }
     StructureKind.LIST -> kType.toTsArrayType()
     StructureKind.MAP -> kType.toTsIndexType()
     StructureKind.CLASS, is PolymorphicKind -> "$kType".substringAfterLast('.')

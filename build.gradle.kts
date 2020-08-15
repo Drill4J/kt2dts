@@ -21,7 +21,7 @@ allprojects {
 
     val kxSerializationVersion: String by extra
     val depConstraints = listOf(
-        "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kxSerializationVersion"
+        "org.jetbrains.kotlinx:kotlinx-serialization-core:$kxSerializationVersion"
     ).map(dependencies.constraints::create)
 
     configurations.all {
@@ -39,9 +39,8 @@ allprojects {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core")
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))

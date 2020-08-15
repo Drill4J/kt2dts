@@ -2,6 +2,7 @@ package com.epam.drill.ts.kt2dts
 
 import kotlinx.serialization.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.json.*
 import java.io.*
 import java.net.*
@@ -17,7 +18,7 @@ data class Descriptor(
 
 typealias AnyKlass = KClass<out Any>
 
-@OptIn(ImplicitReflectionSerializer::class)
+@OptIn(InternalSerializationApi::class)
 fun AnyKlass.descriptor(
     descendants: Set<AnyKlass>? = null
 ) = Descriptor(

@@ -5,7 +5,6 @@ plugins {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation("com.github.ajalt:clikt:2.7.1")
     implementation(project(":"))
 
