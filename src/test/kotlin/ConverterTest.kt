@@ -7,9 +7,9 @@ class ConverterTest {
     @Test
     fun `converts Sample class correctly`() {
         val descriptors = sequenceOf(
-            Sample::class to Sample.serializer().descriptor
+            Sample::class.descriptor()
         )
-        val tsInterface = descriptors.convert().first()
+        val tsInterface = descriptors.convert().first() as TsInterface
         assertEquals(Sample::class.simpleName, tsInterface.name)
         tsInterface.fields[0].run {
             assertEquals("num?", name)
@@ -37,7 +37,7 @@ class ConverterTest {
             )
         )
         val descriptors = sequenceOf(
-            Complex::class to Complex.serializer().descriptor
+            Complex::class.descriptor()
         )
         val converted = descriptors.convert().first()
         assertEquals(expected.render(), converted.render())

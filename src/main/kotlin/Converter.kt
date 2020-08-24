@@ -4,22 +4,31 @@ import kotlinx.serialization.*
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 
-fun Sequence<Descriptor>.convert(): Sequence<TsInterface> = map { (klass, descriptor) ->
-    val klassName = klass.simpleName ?: descriptor.serialName
-    val discriminator = klass.annotations.filterIsInstance<SerialName>().firstOrNull()?.let {
-        listOf(TsField("type", "'${it.value}'"))
-    } ?: emptyList()
-    val classProps = klass.memberProperties.associate { it.name to it.returnType }
-    val fields = descriptor.elementDescriptors().mapIndexed { i, ed ->
-        val name = descriptor.getElementName(i)
-        val kType: KType = classProps.getValue(name)
-        val opt = "?".takeIf { descriptor.isElementOptional(i) } ?: ""
-        TsField(
-            name = "$name$opt",
-            type = ed.toTsType(kType)
-        )
+fun Sequence<Descriptor>.convert(): Sequence<TsType> = mapNotNull { descriptor ->
+    val (klass, serDe, descendants) = descriptor
+    when (serDe.kind) {
+        is PolymorphicKind -> descendants.takeIf { it.any() }?.let {
+            TsUnion(klass.simpleName!!, descendants.mapNotNull(AnyKlass::simpleName))
+        }
+        StructureKind.CLASS -> {
+            val klassName = klass.simpleName ?: serDe.serialName
+            val discriminator = klass.annotations.filterIsInstance<SerialName>().firstOrNull()?.let {
+                listOf(TsField("type", "'${it.value}'"))
+            } ?: emptyList()
+            val classProps = klass.memberProperties.associate { it.name to it.returnType }
+            val fields = serDe.elementDescriptors().mapIndexed { i, ed ->
+                val name = serDe.getElementName(i)
+                val kType: KType = classProps.getValue(name)
+                val opt = "?".takeIf { serDe.isElementOptional(i) } ?: ""
+                TsField(
+                    name = "$name$opt",
+                    type = ed.toTsType(kType)
+                )
+            }
+            TsInterface(klassName, discriminator + fields)
+        }
+        else -> null
     }
-    TsInterface(klassName, discriminator + fields)
 }
 
 private fun SerialDescriptor.toTsType(kType: KType): String = when (kind) {
@@ -29,7 +38,7 @@ private fun SerialDescriptor.toTsType(kType: KType): String = when (kind) {
     UnionKind.ENUM_KIND -> elementNames().joinToString(" | ") { "'$it'" }
     StructureKind.LIST -> kType.toTsArrayType()
     StructureKind.MAP -> kType.toTsIndexType()
-    StructureKind.CLASS -> "$kType".substringAfterLast('.')
+    StructureKind.CLASS, is PolymorphicKind -> "$kType".substringAfterLast('.')
     else -> null
 }?.let { if (isNullable) "${it.trimEnd('?')} | null" else it } ?: error("Unsupported type: $kType")
 

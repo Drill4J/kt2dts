@@ -25,7 +25,7 @@ class MainTest {
             main(args.toTypedArray())
             assertTrue("Output file is empty") { file.length() > 0 }
         } finally {
-//            file.delete()
+            file.delete()
         }
     }
 }

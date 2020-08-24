@@ -32,7 +32,7 @@ allprojects {
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf(
-                "-Xuse-experimental=kotlinx.serialization.ImplicitReflectionSerializer"
+                "-Xopt-in=kotlin.RequiresOptIn"
             )
         }
     }

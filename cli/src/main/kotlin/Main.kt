@@ -28,9 +28,3 @@ private class Kt2DtsMain : CliktCommand() {
         } ?: converted.appendTo(System.out, module)
     }
 }
-
-private fun Sequence<TsInterface>.appendTo(appendable: Appendable, module: String) {
-    appendable.appendln("declare module '$module' {")
-    forEach { it.appendTo(appendable, indent = "  ", modifier = "export ") }
-    appendable.appendln("}")
-}
