@@ -17,7 +17,7 @@ private class Kt2DtsMain : CliktCommand() {
     override fun run() {
         val classLoader = cp?.run {
             val urls = map { File(it).toURI().toURL() }
-            println(urls)
+            println("Converting classes from $urls")
             URLClassLoader(urls.toTypedArray(), Thread.currentThread().contextClassLoader)
         }
         val converted = findSerialDescriptors(classLoader).convert()

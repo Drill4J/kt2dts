@@ -2,7 +2,7 @@ package com.epam.drill.ts.kt2dts
 
 import kotlinx.serialization.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
+import kotlinx.serialization.descriptors.*
 import java.io.*
 import java.net.*
 import java.util.jar.*
@@ -17,7 +17,7 @@ data class Descriptor(
 
 typealias AnyKlass = KClass<out Any>
 
-@OptIn(ImplicitReflectionSerializer::class)
+@InternalSerializationApi
 fun AnyKlass.descriptor(
     descendants: Set<AnyKlass>? = null
 ) = Descriptor(
@@ -37,7 +37,7 @@ fun findSerialDescriptors(
     val classLoader = extClassLoader ?: Thread.currentThread().contextClassLoader
     val classes = (paths + extPaths).asSequence().findClassNames(filter).map {
         classLoader.loadClass(it).kotlin
-    }.filter { it.findAnnotation<Serializable>() != null && !it.isSubclassOf(JsonElement::class) }.toSet()
+    }.filter { it.findAnnotation<Serializable>()?.with == KSerializer::class }.toSet()
     val superClasses: Map<AnyKlass, Set<AnyKlass>> = classes.fold(mapOf()) { map, klass ->
         klass.superclasses.firstOrNull { it in classes }?.let {
             val set = (map[it] ?: emptySet()) + klass

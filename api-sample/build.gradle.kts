@@ -3,7 +3,8 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+val kxSerializationVersion: String by extra
+
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kxSerializationVersion")
 }

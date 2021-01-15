@@ -6,12 +6,10 @@ plugins {
 
 val scriptUrl: String by extra
 
+val jvmTarget = JavaVersion.VERSION_1_8
+
 allprojects {
     apply(from = rootProject.uri("$scriptUrl/git-version.gradle.kts"))
-
-    pluginManager.withPlugin("org.gradle.java-base") {
-        java.targetCompatibility = JavaVersion.VERSION_1_8
-    }
 
     repositories {
         mavenLocal()
@@ -19,29 +17,30 @@ allprojects {
         jcenter()
     }
 
-    val kxSerializationVersion: String by extra
-    val depConstraints = listOf(
-        "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$kxSerializationVersion"
-    ).map(dependencies.constraints::create)
-
-    configurations.all {
-        dependencyConstraints += depConstraints
+    plugins.withType<JavaBasePlugin> {
+        java.targetCompatibility = jvmTarget
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "1.8"
-            freeCompilerArgs = listOf(
-                "-Xopt-in=kotlin.RequiresOptIn"
-            )
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        kotlin {
+            target.compilations.all {
+                kotlinOptions.jvmTarget = "$jvmTarget"
+            }
+            listOf(
+                "kotlinx.serialization.InternalSerializationApi",
+                "kotlinx.serialization.ExperimentalSerializationApi"
+            ).let { annotations ->
+                sourceSets.all { annotations.forEach(languageSettings::useExperimentalAnnotation) }
+            }
         }
     }
 }
 
+val kxSerializationVersion: String by extra
+
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kxSerializationVersion")
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
